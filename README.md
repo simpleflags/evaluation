@@ -61,7 +61,7 @@ This is the most interesting part there are no target groups or segments. So we 
 why variables? Because feature flags are remote "if" or online "if" and if is part of the language
 so variables are more suitable. Variable can have any data type like bool, string, number, slice, map.
 Variables can be used as serving values and values used in rule engine. Variables can be global and local.
-Local variables are used in the project and globals outside of the project. Imagine if you have paid customers and you want to share among different
+Local variables are used in the project and globals outside the project. Imagine if you have paid customers, and you want to share among different
 projects then you can specify global variable paidCustomers.
 
 ```
@@ -79,4 +79,250 @@ Global variables and local variables can have the same name.
 
 ### 6. No private attributes or anonymous target
 
-All targets are private so they are never stored and doesn't require any required field, you can put any property.
+All targets are private, so they are never stored and doesn't require any required field, you can put any property.
+
+## Draft design
+
+Configuration structure:
+
+* `project` is project identifier in your system
+* `environment` can be one of your environments like (dev, prod, stage, stage1)
+* `identifier` is unique configuration (flag) identifier
+* `deprecated` if true, than this configuration should be replaced with new configuration
+* `on` if true configuration is active otherwise it will serve always `off_value`
+* `on_value` when configuration is activated and all rules are failed then serve this value
+* `off_value` when `on` is false it will serve always this value
+* `prerequisites` check first dependencies on flag
+* `rules` array of two fields `expression` and `value`. Value can be one of the types: `string`, `number`, `object (JSON object)`, `array`, `boolean`, `null`. Expressions will be explained in next section.
+* `version` configuration version
+
+Basic sample configuration:
+
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "bool-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": true,
+  "off_value": false,
+  "prerequisites": [],
+  "rules": [],
+  "version": 1
+}
+```
+
+As you can see this is very simple configuration which will server just one of the values `true` or `false`. Note: true and false are reserved keywords.
+
+Basic number flag configuration:
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "number-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": 5,
+  "off_value": 1,
+  "prerequisites": [],
+  "rules": [],
+  "version": 1
+}
+```
+
+Basic number flag configuration using variables:
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "number-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": "var:five",
+  "off_value": "var:one",
+  "prerequisites": [],
+  "rules": [],
+  "version": 1
+}
+```
+
+Basic string flag configuration:
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "string-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": "item one",
+  "off_value": "item two",
+  "prerequisites": [],
+  "rules": [],
+  "version": 1
+}
+```
+
+Basic array flag configuration:
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "slice-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": ["item one", "item two", "item three", "var:success"],
+  "off_value": [],
+  "prerequisites": [],
+  "rules": [],
+  "version": 1
+}
+```
+
+Basic object flag configuration:
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "number-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": {
+    "os": "linux",
+    "distro": "arch"
+  },
+  "off_value": {},
+  "prerequisites": [],
+  "rules": [],
+  "version": 1
+}
+```
+
+Prerequisites flag configuration:
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "number-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": {
+    "os": "linux",
+    "distro": "arch"
+  },
+  "off_value": {},
+  "prerequisites": [
+    {
+      "identifier": "bool-flag",
+      "value": true
+    }
+  ],
+  "rules": [],
+  "version": 1
+}
+```
+
+Rule based flag configuration:
+
+it will serve true only if target identifier is equal to 'enver' otherwise it will be false
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "bool-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": false,
+  "off_value": false,
+  "prerequisites": [],
+  "rules": [
+    {
+      "value": true,
+      "expression": "target.identifier == 'enver'"
+    }
+  ],
+  "version": 1
+}
+```
+
+Percentage rollout flag configuration:
+
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "bool-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": false,
+  "off_value": false,
+  "prerequisites": [],
+  "rules": [
+    {
+      "value": [
+        {
+          "__value__": true,
+          "__weight__": 50
+        },
+        {
+          "__value__": false,
+          "__weight__": 50
+        }
+      ],
+      "expression": "target.identifier in beta_users"
+    }
+  ],
+  "version": 1
+}
+```
+
+Scheduled configurations
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "bool-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": false,
+  "off_value": false,
+  "prerequisites": [],
+  "rules": [
+    {
+      "value": true,
+      "expression": "target.identifier in paid_customers and now() >= date('2022-10-01')"
+    }
+  ],
+  "version": 1
+}
+```
+
+another example of scheduled flags:
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "bool-flag",
+  "deprecated": false,
+  "on": true,
+  "on_value": false,
+  "off_value": false,
+  "prerequisites": [],
+  "rules": [
+    {
+      "value": [
+        {
+          "__value__": true,
+          "__weight__": 50
+        },
+        {
+          "__value__": false,
+          "__weight__": 50
+        }
+      ],
+      "expression": "target.identifier in beta_users and now() >= date('2022-10-01')"
+    }
+  ],
+  "version": 1
+}
+```

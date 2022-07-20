@@ -21,7 +21,7 @@ type visitor struct {
 	variables []string
 }
 
-func (v *visitor) Enter(node *ast.Node) {}
+func (v *visitor) Enter(_ *ast.Node) {}
 func (v *visitor) Exit(node *ast.Node) {
 	if n, ok := (*node).(*ast.IdentifierNode); ok {
 		if n.Value != "target" {
@@ -129,7 +129,7 @@ func (e *Evaluator) checkPreRequisite(parent *Configuration, target Target) erro
 			prerequisites,
 			parent.Identifier)
 		for _, pre := range prerequisites {
-			prereqFeature := pre.Feature
+			prereqFeature := pre.Identifier
 			prereqFeatureConfig, err := e.provider.GetConfiguration(prereqFeature)
 			if err != nil {
 				log.Errorf(
@@ -175,9 +175,9 @@ func (e *Evaluator) Evaluate(key string, target Target) Evaluation {
 	}
 
 	evaluation := Evaluation{
-		Project:      flag.Project,
-		Environment:  flag.Environment,
-		Identifier:   flag.Identifier,
+		Project:     flag.Project,
+		Environment: flag.Environment,
+		Identifier:  flag.Identifier,
 	}
 
 	if flag.Prerequisites != nil {

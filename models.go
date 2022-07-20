@@ -17,37 +17,14 @@ type Rule struct {
 	Value      interface{} `json:"value"`
 } // @name Rule
 
-type PercentageRollout struct {
-	Expression string `json:"expression"`
-	Serve      map[interface{}]interface{}
-} // @name PercentageRollout
-
-type WeightedVariation struct {
-	Variation string `json:"variation" validate:"required"`
-	Weight    int    `json:"weight" validate:"required"`
-} // @name WeightedVariation
-
-type Distribution struct {
-	BucketBy   string              `json:"bucketBy" validate:"required"`
-	Variations []WeightedVariation `json:"variations" validate:"required"`
-} // @name Distribution
-
-func (d Distribution) IsEmpty() bool {
-	return d.BucketBy == "" && d.Variations == nil || d.Variations != nil && len(d.Variations) > 0
-}
-
-type Serve struct {
-	Distribution *Distribution `json:"distribution,omitempty"`
-	Variation    *string       `json:"variation,omitempty"`
-} // @name Serve
-
-func (s Serve) IsEmpty() bool {
-	return s.Distribution == nil && s.Variation == nil || s.Distribution != nil && s.Distribution.IsEmpty()
-}
+type RolloutItem struct {
+	Value  interface{} `json:"__value__"`
+	Weight int         `json:"__weight__"`
+} // @name RolloutItem
 
 type Prerequisite struct {
-	Feature string      `json:"feature" validate:"required"`
-	Value   interface{} `json:"value" validate:"required"`
+	Identifier string      `json:"identifier" validate:"required"`
+	Value      interface{} `json:"value" validate:"required"`
 } // @name Prerequisite
 
 type Configuration struct {
@@ -56,8 +33,8 @@ type Configuration struct {
 	Identifier    string         `json:"identifier"`
 	Deprecated    bool           `json:"deprecated"`
 	On            bool           `json:"on"`
-	OnValue       interface{}    `json:"onValue"`
-	OffValue      interface{}    `json:"offValue"`
+	OnValue       interface{}    `json:"on_value"`
+	OffValue      interface{}    `json:"off_value"`
 	Rules         []Rule         `json:"rules"`
 	Prerequisites []Prerequisite `json:"prerequisites"`
 	Version       uint           `json:"version"`
@@ -79,11 +56,11 @@ func (t Target) GetAttrValue(attr string) reflect.Value {
 }
 
 type Evaluation struct {
-	Project      string      `json:"project"`
-	Environment  string      `json:"environment"`
-	Identifier   string      `json:"identifier"`
-	Value        interface{} `json:"value"`
-	err          error
+	Project     string      `json:"project"`
+	Environment string      `json:"environment"`
+	Identifier  string      `json:"identifier"`
+	Value       interface{} `json:"value"`
+	err         error
 } // @name Evaluation
 
 type Evaluations []Evaluation // @name Evaluations
