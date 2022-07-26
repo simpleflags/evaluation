@@ -45,11 +45,19 @@ One thing why engine is different from others it can serve any values as you wis
 - Map
 - Slice
 
-```
+```go
 evaluate("some_flag", target).Bool(defaultValue)
 ```
 
-if `some_flag` serves string values 'true' or 'false' you can call bool or string methods it will give same results. 
+if `some_flag` serves string values 'true' or 'false' you can call bool or string methods it will give same results.
+
+when Generics are fully implemented into Golang then signature will be:
+```go
+type types interface {
+	~bool | ~string | ~float64 | ~map[string]any | []any
+}
+evaluate[T types]("some_flag", target, true) T
+```
 
 ### 4. No states (on, off)
 
@@ -139,8 +147,8 @@ Basic number flag configuration using variables:
   "identifier": "number-flag",
   "deprecated": false,
   "on": true,
-  "on_value": "var:five",
-  "off_value": "var:one",
+  "on_value": "${five}",
+  "off_value": "${one}",
   "prerequisites": [],
   "rules": [],
   "version": 1
@@ -171,7 +179,7 @@ Basic array flag configuration:
   "identifier": "slice-flag",
   "deprecated": false,
   "on": true,
-  "on_value": ["item one", "item two", "item three", "var:success"],
+  "on_value": ["item one", "item two", "item three","${success}"],
   "off_value": [],
   "prerequisites": [],
   "rules": [],
