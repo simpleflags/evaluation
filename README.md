@@ -116,7 +116,7 @@ Basic sample configuration:
   "prerequisites": [],
   "rules": [
     {
-      "value": true,
+      "value": true, // default serve
       "expression": ""
     }
   ],
@@ -138,7 +138,7 @@ Basic number flag configuration:
   "prerequisites": [],
   "rules": [
     {
-      "value": 5,
+      "value": 5, // default serve
       "expression": ""
     }
   ],
@@ -158,7 +158,7 @@ Basic number flag configuration using variables:
   "prerequisites": [],
   "rules": [
     {
-      "value": "${five}",
+      "value": "${five}", // default serve
       "expression": ""
     }
   ],
@@ -178,7 +178,7 @@ Basic string flag configuration:
   "prerequisites": [],
   "rules": [
     {
-      "value": "item one",
+      "value": "item one", // default serve
       "expression": ""
     }
   ],
@@ -198,7 +198,7 @@ Basic array flag configuration:
   "prerequisites": [],
   "rules": [
     {
-      "value": ["item one", "item two", "item three","${success}"],
+      "value": ["item one", "item two", "item three","${success}"], // default serve
       "expression": ""
     }
   ],
@@ -218,7 +218,7 @@ Basic object flag configuration:
   "prerequisites": [],
   "rules": [
     {
-      "value": {
+      "value": { // default serve
         "os": "linux",
         "distro": "arch"
       },
@@ -246,7 +246,7 @@ Prerequisites flag configuration:
   ],
   "rules": [
     {
-      "value": {
+      "value": {  // default serve
         "os": "linux",
         "distro": "arch"
       },
@@ -278,6 +278,29 @@ it will serve true only if target identifier is equal to 'enver' otherwise it wi
   "version": 1
 }
 ```
+multivariate flag with some custom rule
+```json
+{
+  "project": "demo",
+  "environment": "dev",
+  "identifier": "bool-flag",
+  "deprecated": false,
+  "on": true,
+  "off_value": "item1",
+  "prerequisites": [],
+  "rules": [
+    {
+      "value": "item3",
+      "expression": "target.identifier == 'enver'"
+    },
+    {
+      "value": "item2", // default serve
+      "expression": ""
+    }
+  ],
+  "version": 1
+}
+```
 
 Percentage rollout flag configuration:
 
@@ -303,6 +326,10 @@ Percentage rollout flag configuration:
         }
       ],
       "expression": "target.identifier in beta_users"
+    },
+    {
+      "value": false, // default serve
+      "expression": ""
     }
   ],
   "version": 1
@@ -352,6 +379,10 @@ another example of scheduled flags:
         }
       ],
       "expression": "target.identifier in beta_users and now() >= date('2022-10-01')"
+    },
+    {
+      "value": false, // default serve
+      "expression": ""
     }
   ],
   "version": 1
