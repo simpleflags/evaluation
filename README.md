@@ -158,7 +158,7 @@ Basic number flag configuration using variables:
   "prerequisites": [],
   "rules": [
     {
-      "value": "${one}",
+      "value": "${five}",
       "expression": ""
     }
   ],
