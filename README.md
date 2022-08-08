@@ -98,7 +98,6 @@ Configuration structure:
 * `identifier` is unique configuration (flag) identifier
 * `deprecated` if true, than this configuration should be replaced with new configuration
 * `on` if true configuration is active otherwise it will serve always `off_value`
-* `on_value` when configuration is activated and all rules are failed then serve this value
 * `off_value` when `on` is false it will serve always this value
 * `prerequisites` check first dependencies on flag
 * `rules` array of two fields `expression` and `value`. Value can be one of the types: `string`, `number`, `object (JSON object)`, `array`, `boolean`, `null`. Expressions will be explained in next section.
@@ -113,10 +112,14 @@ Basic sample configuration:
   "identifier": "bool-flag",
   "deprecated": false,
   "on": true,
-  "on_value": true,
   "off_value": false,
   "prerequisites": [],
-  "rules": [],
+  "rules": [
+    {
+      "value": true,
+      "expression": ""
+    }
+  ],
   "version": 1
 }
 ```
@@ -131,10 +134,14 @@ Basic number flag configuration:
   "identifier": "number-flag",
   "deprecated": false,
   "on": true,
-  "on_value": 5,
   "off_value": 1,
   "prerequisites": [],
-  "rules": [],
+  "rules": [
+    {
+      "value": 5,
+      "expression": ""
+    }
+  ],
   "version": 1
 }
 ```
@@ -147,10 +154,14 @@ Basic number flag configuration using variables:
   "identifier": "number-flag",
   "deprecated": false,
   "on": true,
-  "on_value": "${five}",
   "off_value": "${one}",
   "prerequisites": [],
-  "rules": [],
+  "rules": [
+    {
+      "value": "${one}",
+      "expression": ""
+    }
+  ],
   "version": 1
 }
 ```
@@ -163,10 +174,14 @@ Basic string flag configuration:
   "identifier": "string-flag",
   "deprecated": false,
   "on": true,
-  "on_value": "item one",
   "off_value": "item two",
   "prerequisites": [],
-  "rules": [],
+  "rules": [
+    {
+      "value": "item one",
+      "expression": ""
+    }
+  ],
   "version": 1
 }
 ```
@@ -179,10 +194,14 @@ Basic array flag configuration:
   "identifier": "slice-flag",
   "deprecated": false,
   "on": true,
-  "on_value": ["item one", "item two", "item three","${success}"],
   "off_value": [],
   "prerequisites": [],
-  "rules": [],
+  "rules": [
+    {
+      "value": ["item one", "item two", "item three","${success}"],
+      "expression": ""
+    }
+  ],
   "version": 1
 }
 ```
@@ -195,13 +214,17 @@ Basic object flag configuration:
   "identifier": "number-flag",
   "deprecated": false,
   "on": true,
-  "on_value": {
-    "os": "linux",
-    "distro": "arch"
-  },
   "off_value": {},
   "prerequisites": [],
-  "rules": [],
+  "rules": [
+    {
+      "value": {
+        "os": "linux",
+        "distro": "arch"
+      },
+      "expression": ""
+    }
+  ],
   "version": 1
 }
 ```
@@ -214,10 +237,6 @@ Prerequisites flag configuration:
   "identifier": "number-flag",
   "deprecated": false,
   "on": true,
-  "on_value": {
-    "os": "linux",
-    "distro": "arch"
-  },
   "off_value": {},
   "prerequisites": [
     {
@@ -225,7 +244,15 @@ Prerequisites flag configuration:
       "value": true
     }
   ],
-  "rules": [],
+  "rules": [
+    {
+      "value": {
+        "os": "linux",
+        "distro": "arch"
+      },
+      "expression": ""
+    }
+  ],
   "version": 1
 }
 ```
@@ -240,7 +267,6 @@ it will serve true only if target identifier is equal to 'enver' otherwise it wi
   "identifier": "bool-flag",
   "deprecated": false,
   "on": true,
-  "on_value": false,
   "off_value": false,
   "prerequisites": [],
   "rules": [
@@ -262,7 +288,6 @@ Percentage rollout flag configuration:
   "identifier": "bool-flag",
   "deprecated": false,
   "on": true,
-  "on_value": false,
   "off_value": false,
   "prerequisites": [],
   "rules": [
@@ -292,7 +317,6 @@ Scheduled configurations
   "identifier": "bool-flag",
   "deprecated": false,
   "on": true,
-  "on_value": false,
   "off_value": false,
   "prerequisites": [],
   "rules": [
@@ -313,7 +337,6 @@ another example of scheduled flags:
   "identifier": "bool-flag",
   "deprecated": false,
   "on": true,
-  "on_value": false,
   "off_value": false,
   "prerequisites": [],
   "rules": [
