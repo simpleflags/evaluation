@@ -52,6 +52,10 @@ func NewEvaluator(provider DataProvider) (*Evaluator, error) {
 }
 
 func (e *Evaluator) evaluateExpression(expression string, target Target) (bool, error) {
+	if expression == "" { // return true if expression is empty it means to deliver to any
+		return true, nil
+	}
+
 	values := make(map[string]interface{})
 
 	targetMap := make(map[string]interface{})
@@ -84,8 +88,8 @@ func (e *Evaluator) evaluateExpression(expression string, target Target) (bool, 
 	return result, nil
 }
 
-func (e *Evaluator) evaluateTargetRules(rules []Rule, target Target) (interface{}, error) {
-	if len(rules) == 0 || target == nil {
+func (e *Evaluator) evaluateRules(rules []Rule, target Target) (interface{}, error) {
+	if len(rules) == 0 {
 		return nil, errors.New("no rules or target specified")
 	}
 
@@ -102,9 +106,9 @@ func (e *Evaluator) evaluateTargetRules(rules []Rule, target Target) (interface{
 	return nil, nil
 }
 
-func (e *Evaluator) evaluateFlag(fc Configuration, target Target) (interface{}, error) {
+func (e *Evaluator) evaluateFlag(fc *Configuration, target Target) (interface{}, error) {
 	if fc.On {
-		v, err := e.evaluateTargetRules(fc.Rules, target)
+		v, err := e.evaluateRules(fc.Rules, target)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +116,6 @@ func (e *Evaluator) evaluateFlag(fc Configuration, target Target) (interface{}, 
 		if v != nil {
 			return v, nil
 		}
-		return fc.OnValue, nil
 	}
 	return fc.OffValue, nil
 }
@@ -137,7 +140,7 @@ func (e *Evaluator) checkPreRequisite(parent *Configuration, target Target) erro
 				return nil
 			}
 
-			prereqEvaluatedVariation, err := e.evaluateFlag(prereqFeatureConfig, target)
+			prereqEvaluatedVariation, err := e.evaluateFlag(&prereqFeatureConfig, target)
 			if err != nil {
 				return err
 			}
@@ -189,7 +192,7 @@ func (e *Evaluator) Evaluate(key string, target Target) Evaluation {
 		}
 	}
 
-	val, err := e.evaluateFlag(flag, target)
+	val, err := e.evaluateFlag(&flag, target)
 	if err != nil {
 		evaluation.err = err
 	} else {
