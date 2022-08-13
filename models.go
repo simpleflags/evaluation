@@ -33,7 +33,6 @@ type Configuration struct {
 	Identifier    string         `json:"identifier"`
 	Deprecated    bool           `json:"deprecated"`
 	On            bool           `json:"on"`
-	OnValue       interface{}    `json:"on_value"`
 	OffValue      interface{}    `json:"off_value"`
 	Rules         []Rule         `json:"rules"`
 	Prerequisites []Prerequisite `json:"prerequisites"`
